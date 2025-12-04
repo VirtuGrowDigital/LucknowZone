@@ -7,13 +7,23 @@ export default function Dashboard() {
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [filterType, setFilterType] = useState("all"); // all, news, blog, api, admin
+  const [filterType, setFilterType] = useState("all");
+
+  // 🔢 Pagination state
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
   const fetchNews = async () => {
     try {
       setLoading(true);
-      const res = await API.get("/news");
-      setNews(res.data);
+
+      // ⬇️ Call paginated endpoint
+      const res = await API.get(`/news/paginated?page=${page}&limit=10`);
+
+      setNews(res.data.data);       // array of news
+      setPages(res.data.pages);     // total pages
+      setTotal(res.data.total);     // total records
     } catch (err) {
       console.error("Failed to fetch news:", err);
     } finally {
@@ -45,13 +55,15 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchNews();
-  }, []);
+    // refetch when page changes
+  }, [page]);
 
   // 🔎 Search + Filter Logic
   const filteredNews = news.filter((item) => {
+    const q = search.toLowerCase();
     const matchesSearch =
-      item.title?.toLowerCase().includes(search.toLowerCase()) ||
-      item.description?.toLowerCase().includes(search.toLowerCase());
+      item.title?.toLowerCase().includes(q) ||
+      item.description?.toLowerCase().includes(q);
 
     const matchesFilter =
       filterType === "all" ||
@@ -67,13 +79,16 @@ export default function Dashboard() {
     <div className="flex min-h-screen bg-[#f1f1f1]">
       <Sidebar />
 
-      <div className="flex-1 p-8 md:p-10">
-        <div className="flex justify-between items-center mb-6">
+      <div className="flex-1 p-8 md:p-10 ">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
           <h1 className="text-2xl md:text-3xl font-bold">News & Blogs Overview</h1>
+          <p className="text-sm text-gray-600">
+            Total items: <span className="font-semibold">{total}</span>
+          </p>
         </div>
 
-        {/* 🔎 Search + Filters */}
-        <div className="flex flex-col md:flex-row gap-3 mb-6">
+        {/* Search + Filters */}
+        <div className="flex flex-col md:flex-row gap-3 mb-4 md:mb-6">
           <input
             type="text"
             placeholder="Search news or blogs..."
@@ -95,6 +110,38 @@ export default function Dashboard() {
           </select>
         </div>
 
+        {/* 📄 Pagination Controls */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="text-sm text-gray-600">
+            Page <span className="font-semibold">{page}</span> of{" "}
+            <span className="font-semibold">{pages}</span>
+          </div>
+          <div className="flex gap-2">
+            <button
+              disabled={page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              className={`px-3 py-1 rounded-lg text-sm border ${
+                page <= 1
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-white hover:bg-gray-100"
+              }`}
+            >
+              Prev
+            </button>
+            <button
+              disabled={page >= pages}
+              onClick={() => setPage((p) => Math.min(pages, p + 1))}
+              className={`px-3 py-1 rounded-lg text-sm border ${
+                page >= pages
+                  ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  : "bg-white hover:bg-gray-100"
+              }`}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
         {/* Table */}
         <div className="bg-white rounded-2xl shadow-lg p-4 md:p-6">
           {loading ? (
@@ -106,6 +153,7 @@ export default function Dashboard() {
               <table className="w-full text-sm md:text-base">
                 <thead>
                   <tr className="border-b text-gray-700 font-semibold">
+                    <th className="py-3 text-left">IMAGE</th>
                     <th className="py-3 text-left">TITLE</th>
                     <th className="py-3 text-left">TYPE</th>
                     <th className="py-3 text-left">CATEGORY</th>
@@ -121,13 +169,19 @@ export default function Dashboard() {
                       key={item._id || item.title + index}
                       className="border-b last:border-b-0 hover:bg-gray-50"
                     >
+                      <td className="py-3">
+                        <img
+                          src={item.image || "https://via.placeholder.com/100"}
+                          className="w-20 h-16 object-cover rounded"
+                          alt="img"
+                        />
+                      </td>
+
                       <td className="py-3 pr-3 max-w-xs">
                         <div className="line-clamp-2">{item.title}</div>
                       </td>
 
-                      <td className="py-3 capitalize">
-                        {item.type || "news"}
-                      </td>
+                      <td className="py-3 capitalize">{item.type || "news"}</td>
 
                       <td className="py-3">{item.category || "-"}</td>
 
@@ -155,6 +209,7 @@ export default function Dashboard() {
 
                       <td className="py-3">
                         <div className="flex gap-4 items-center">
+                          {/* Toggle */}
                           {!item.isAPI && (
                             <button
                               onClick={() => handleToggle(item)}
@@ -168,6 +223,7 @@ export default function Dashboard() {
                             </button>
                           )}
 
+                          {/* Delete */}
                           {!item.isAPI && (
                             <button
                               onClick={() => handleDelete(item)}
@@ -177,6 +233,7 @@ export default function Dashboard() {
                             </button>
                           )}
 
+                          {/* No actions for API news */}
                           {item.isAPI && (
                             <span className="text-gray-400 text-xs">No actions</span>
                           )}

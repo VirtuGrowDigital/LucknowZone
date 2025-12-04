@@ -1,56 +1,49 @@
 import News from "../models/News.js";
 import axios from "axios";
 
-// ========== GET ALL NEWS (Manual + API) ==========
+// GET ALL NEWS (API + Manual)
 export const getAllNews = async (req, res) => {
   try {
     const manualNews = await News.find().sort({ createdAt: -1 });
 
-    // Fetch API News
     let apiNews = [];
     try {
-      const apiRes = await axios.get(
+      const newsRes = await axios.get(
         `https://newsapi.org/v2/top-headlines?country=in&apiKey=${process.env.NEWS_API_KEY}`
       );
 
-      apiNews = apiRes.data.articles.map((item) => ({
+      apiNews = newsRes.data.articles.map((item) => ({
         title: item.title,
         description: item.description,
-        content: item.content,
-        category: "ApiNews",
+        category: "API-News",
         image: item.urlToImage,
-        author: item.source.name || "Unknown",
-        createdAt: item.publishedAt,
-        isAPI: true,     // Important flag
-        hidden: false,   // API news should always be visible
-        type: "news"
+        isAPI: true,
+        hidden: false,
+        type: "news",
+        createdAt: item.publishedAt
       }));
-    } catch (e) {
-      console.log("API fetch failed", e.message);
+    } catch (err) {
+      console.log("News API failed:", err.message);
     }
 
-    // Combine both
-    const allNews = [...manualNews, ...apiNews];
+    const all = [...manualNews, ...apiNews].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
 
-    // Sort by time
-    allNews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-    res.json(allNews);
+    res.json(all);
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch news" });
+    res.status(500).json({ error: "Failed to load news" });
   }
 };
 
-// ========== CREATE NEWS ==========
+// CREATE NEWS
 export const createNews = async (req, res) => {
   try {
-    const newPost = new News({
+    await News.create({
       ...req.body,
       isAPI: false,
       createdAt: new Date()
     });
-
-    await newPost.save();
 
     res.json({ message: "News added successfully" });
   } catch (err) {
@@ -58,66 +51,75 @@ export const createNews = async (req, res) => {
   }
 };
 
-// ========== UPDATE MANUAL NEWS ==========
+// UPDATE NEWS
 export const updateNews = async (req, res) => {
   try {
     const news = await News.findById(req.params.id);
 
-    if (!news) {
-      return res.status(404).json({ error: "News not found" });
-    }
-
-    if (news.isAPI) {
-      return res.status(403).json({ error: "API news cannot be updated" });
-    }
+    if (!news) return res.status(404).json({ error: "Not found" });
+    if (news.isAPI) return res.status(403).json({ error: "API news can't be edited" });
 
     const updated = await News.findByIdAndUpdate(req.params.id, req.body, { new: true });
 
-    res.json({ message: "News updated successfully", updated });
+    res.json({ message: "Updated", updated });
   } catch (err) {
-    res.status(500).json({ error: "Failed to update news" });
+    res.status(500).json({ error: "Update failed" });
   }
 };
 
-// ========== DELETE MANUAL NEWS ==========
+// DELETE NEWS
 export const deleteNews = async (req, res) => {
   try {
     const news = await News.findById(req.params.id);
 
-    if (!news) {
-      return res.status(404).json({ error: "News not found" });
-    }
-
-    if (news.isAPI) {
-      return res.status(403).json({ error: "API news cannot be deleted" });
-    }
+    if (!news) return res.status(404).json({ error: "Not found" });
+    if (news.isAPI) return res.status(403).json({ error: "API news can't be deleted" });
 
     await News.findByIdAndDelete(req.params.id);
 
-    res.json({ message: "News deleted successfully" });
+    res.json({ message: "Deleted" });
   } catch (err) {
-    res.status(500).json({ error: "Failed to delete news" });
+    res.status(500).json({ error: "Delete failed" });
   }
 };
 
-// ========== TOGGLE HIDDEN ==========
+// TOGGLE HIDE
 export const toggleHidden = async (req, res) => {
   try {
     const news = await News.findById(req.params.id);
 
-    if (!news) {
-      return res.status(404).json({ error: "News not found" });
-    }
-
-    if (news.isAPI) {
-      return res.status(403).json({ error: "API news cannot be hidden" });
-    }
+    if (!news) return res.status(404).json({ error: "Not found" });
+    if (news.isAPI) return res.status(403).json({ error: "API news can't be hidden" });
 
     news.hidden = !news.hidden;
     await news.save();
 
-    res.json({ message: "Visibility updated", hidden: news.hidden });
+    res.json({ message: "Updated", hidden: news.hidden });
   } catch (err) {
-    res.status(500).json({ error: "Failed to toggle hidden state" });
+    res.status(500).json({ error: "Toggle failed" });
+  }
+};
+
+export const getPaginatedNews = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+
+    const skip = (page - 1) * limit;
+
+    const total = await News.countDocuments();
+    const data = await News.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.json({
+      page,
+      total,
+      pages: Math.ceil(total / limit),
+      data,
+    });
+  } catch (err) {
+    res.status(500).json({ error: "Pagination failed" });
   }
 };

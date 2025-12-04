@@ -1,50 +1,79 @@
 import { useState } from "react";
 import API from "../utils/api";
 import DashboardLayout from "../components/DashboardLayout";
-import { storage } from "../firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function AddNews() {
   const [form, setForm] = useState({
     title: "",
     description: "",
     category: "",
-    image: "",
+    image: "",   // Base64 OR URL
     type: "news",
   });
 
   const [uploading, setUploading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
 
-  const handleChange = (e) =>
+  // -----------------------------
+  // HANDLE TEXT INPUT
+  // -----------------------------
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setUploadSuccess(false); // fix: prevent "uploaded" showing on URL paste
+  };
 
-  const handleImageUpload = async (e) => {
+  // -----------------------------
+  // HANDLE IMAGE UPLOAD (Base64)
+  // -----------------------------
+  const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     setUploading(true);
+    setUploadSuccess(false);
 
-    const storageRef = ref(storage, `newsImages/${Date.now()}-${file.name}`);
-    await uploadBytes(storageRef, file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setForm((prev) => ({
+        ...prev,
+        image: reader.result,  // Base64 string
+      }));
 
-    const downloadURL = await getDownloadURL(storageRef);
-    setForm({ ...form, image: downloadURL });
+      setUploading(false);
+      setUploadSuccess(true);
+    };
 
-    setUploading(false);
+    reader.readAsDataURL(file);
   };
 
+  // -----------------------------
+  // SUBMIT FORM
+  // -----------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await API.post("/news", form);
 
-    alert("News added!");
-    setForm({
-      title: "",
-      description: "",
-      category: "",
-      image: "",
-      type: "news",
-    });
+    if (!form.image) {
+      alert("Upload an image or paste an image URL first!");
+      return;
+    }
+
+    try {
+      await API.post("/news", form);
+      alert("News added!");
+
+      setForm({
+        title: "",
+        description: "",
+        category: "",
+        image: "",
+        type: "news",
+      });
+
+      setUploadSuccess(false);
+    } catch (err) {
+      console.error("Error adding news:", err);
+      alert("Failed to add news");
+    }
   };
 
   return (
@@ -86,26 +115,33 @@ export default function AddNews() {
             required
           />
 
-          {/* Upload from PC */}
-          <label>Upload Image from PC</label>
-          <input
-            type="file"
-            accept="image/*"
-            className="w-full border p-2 rounded-md mb-4"
-            onChange={handleImageUpload}
-          />
+          {/* Upload Base64 OR Paste URL */}
+          <label>Upload Image OR Paste URL</label>
+          <div className="flex gap-3 mb-4">
+            <input
+              type="file"
+              accept="image/*"
+              className="border p-2 rounded-md w-1/2"
+              onChange={handleImageUpload}
+            />
 
-          {uploading && <p className="text-red-600 mb-3">Uploading...</p>}
+            <input
+              type="text"
+              name="image"
+              placeholder="https://image-url"
+              className="border p-2 rounded-md w-1/2"
+              value={form.image}
+              onChange={handleChange}
+            />
+          </div>
 
-          {/* URL input */}
-          <label>Or Paste Image URL</label>
-          <input
-            type="text"
-            name="image"
-            className="w-full border p-3 rounded-md mb-6"
-            value={form.image}
-            onChange={handleChange}
-          />
+          {uploading && <p className="text-blue-600 mb-3">Uploading...</p>}
+
+          {uploadSuccess && (
+            <p className="text-green-600 mb-3 font-semibold">
+              Image Uploaded Successfully!
+            </p>
+          )}
 
           <button className="bg-red-600 hover:bg-red-700 text-white font-bold w-full py-3 rounded-lg">
             Publish News
