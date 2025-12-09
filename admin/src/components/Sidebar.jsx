@@ -7,17 +7,23 @@ import {
   FaNewspaper,
   FaBars,
   FaTimes,
+  FaBolt,   // Icon for ticker
+  // FaTag,  // Optional alternative
 } from "react-icons/fa";
 import logo from "../assets/Images/Logo.png";
 
 export default function Sidebar() {
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false); // mobile sidebar toggle
+  const [open, setOpen] = useState(false);
 
   const menuItems = [
     { name: "Dashboard", icon: <FaHome />, path: "/dashboard" },
     { name: "Add News", icon: <FaNewspaper />, path: "/add-news" },
     { name: "Add Blog", icon: <FaBlog />, path: "/add-blog" },
+
+    // ✅ NEW TICKER MENU ITEM
+    { name: "Add Ticker", icon: <FaBolt />, path: "/add-ticker" },
+    // Alternative: { name: "Add Ticker", icon: <FaTag />, path: "/add-ticker" },
   ];
 
   const handleLogout = () => {
