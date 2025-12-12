@@ -14,11 +14,11 @@ export default function WeatherForecastCard() {
     useWeatherData();
 
   const iconMap = {
-    sun: <WiDaySunny className="text-yellow-400 text-6xl drop-shadow-lg" />,
-    "sun-cloud": <WiDayCloudy className="text-yellow-300 text-6xl drop-shadow-lg" />,
-    cloud: <WiCloud className="text-gray-300 text-6xl drop-shadow-lg" />,
-    rain: <WiRain className="text-blue-400 text-6xl drop-shadow-lg" />,
-    storm: <WiThunderstorm className="text-yellow-200 text-6xl drop-shadow-lg" />,
+    sun: <WiDaySunny className="text-yellow-400 text-5xl drop-shadow-md" />,
+    "sun-cloud": <WiDayCloudy className="text-yellow-300 text-5xl drop-shadow-md" />,
+    cloud: <WiCloud className="text-gray-300 text-5xl drop-shadow-md" />,
+    rain: <WiRain className="text-blue-400 text-5xl drop-shadow-md" />,
+    storm: <WiThunderstorm className="text-yellow-200 text-5xl drop-shadow-md" />,
   };
 
   const safeForecast = Array.isArray(weeklyForecast)
@@ -26,52 +26,58 @@ export default function WeatherForecastCard() {
     : [];
 
   return (
-    <div className="w-full max-w-lg mx-auto bg-white/90 backdrop-blur-xl shadow-2xl rounded-3xl p-7 border border-white/40 transition-all duration-300 hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)]">
-      
+    <div
+      className="
+        w-full max-w-lg mx-auto 
+        bg-white/90 backdrop-blur-xl 
+        shadow-xl rounded-3xl 
+        p-6 border border-white/40 
+        transition-all duration-300 
+        hover:shadow-[0_16px_32px_rgba(0,0,0,0.12)]
+        scale-[0.75] origin-top
+      "
+    >
       {/* Header */}
-      <h2 className="text-xl font-semibold text-gray-900 mb-4 tracking-wide">
+      <h2 className="text-lg font-semibold text-gray-900 mb-4 tracking-wide">
         Weather Forecast
       </h2>
 
       {/* Current Weather Section */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-5">
-          <p className="text-6xl font-extrabold bg-gradient-to-br from-yellow-400 to-orange-500 text-transparent bg-clip-text drop-shadow-md">
+        <div className="flex items-center gap-4">
+          <p className="text-5xl font-extrabold bg-gradient-to-br from-yellow-400 to-orange-500 text-transparent bg-clip-text drop-shadow-md">
             {temperature ?? "--"}°
           </p>
-
           <div className="flex items-center">
             {iconMap[conditionIcon] || iconMap.sun}
           </div>
         </div>
 
         <div className="text-right">
-          <p className="text-lg font-semibold text-gray-800">Lucknow</p>
-          <p className="text-sm text-gray-500">{condition || "Loading..."}</p>
+          <p className="text-base font-semibold text-gray-800">Lucknow</p>
+          <p className="text-xs text-gray-500">{condition || "Loading..."}</p>
         </div>
       </div>
 
       {/* Divider */}
-      <div className="h-[1px] bg-gray-300/40 my-6"></div>
+      <div className="h-[1px] bg-gray-300/30 my-5"></div>
 
       {/* Forecast Grid */}
-      <div className="grid grid-cols-4 gap-4 text-center">
+      <div className="grid grid-cols-4 gap-3 text-center">
         {safeForecast.length ? (
           safeForecast.map((d, i) => (
             <div
               key={i}
-              className="p-3 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all duration-200 shadow-sm hover:shadow-md"
+              className="p-2 rounded-xl bg-gray-50 hover:bg-gray-100 transition-all duration-200 shadow-sm hover:shadow-md"
             >
-              <p className="text-gray-700 text-sm font-medium">{d.day}</p>
+              <p className="text-gray-700 text-xs font-medium">{d.day}</p>
 
-              <div className="flex justify-center my-2">
-                <span className="text-4xl">
-                  {iconMap[d.icon] || iconMap.sun}
-                </span>
+              <div className="flex justify-center my-1">
+                <span className="text-3xl">{iconMap[d.icon] || iconMap.sun}</span>
               </div>
 
-              <p className="text-lg font-semibold text-gray-800">{d.max}°</p>
-              <p className="text-xs text-gray-500">{d.min}° min</p>
+              <p className="text-sm font-semibold text-gray-800">{d.max}°</p>
+              <p className="text-[10px] text-gray-500">{d.min}° min</p>
             </div>
           ))
         ) : (

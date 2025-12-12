@@ -20,6 +20,8 @@ export default function Sidebar() {
     { name: "Dashboard", icon: <FaHome />, path: "/dashboard" },
     { name: "Add News", icon: <FaNewspaper />, path: "/add-news" },
     { name: "Add Blog", icon: <FaBlog />, path: "/add-blog" },
+    { name: "Pending API News", path: "/pending-api-news" },
+
 
     // ✅ NEW TICKER MENU ITEM
     { name: "Add Ticker", icon: <FaBolt />, path: "/add-ticker" },

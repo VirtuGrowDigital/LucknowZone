@@ -2,21 +2,30 @@ import jwt from "jsonwebtoken";
 
 const auth = (req, res, next) => {
   try {
-    // Expect: "Authorization: Bearer <token>"
     const authHeader = req.headers.authorization;
-    if (!authHeader)
-      return res.status(401).json({ error: "No token provided" });
 
+    if (!authHeader) {
+      return res.status(401).json({ error: "No authorization header provided" });
+    }
+
+    // Expected format: "Bearer <token>"
     const token = authHeader.split(" ")[1];
-    if (!token)
-      return res.status(401).json({ error: "Token missing" });
 
-    // Verify token
+    if (!token) {
+      return res.status(401).json({ error: "Token missing" });
+    }
+
+    // Verify token using your single secret
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.admin = decoded.id; // save admin ID for later use
-    next(); // continue to next function
+    // Attach decoded user/admin info
+    req.user = {
+      id: decoded.id,
+      email: decoded.email,
+      role: decoded.role || "user",
+    };
 
+    next();
   } catch (error) {
     return res.status(401).json({ error: "Invalid or expired token" });
   }

@@ -7,6 +7,10 @@ import AddTicker from "./pages/AddTicker";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Toaster } from "react-hot-toast";
+import PendingAPINews from "./pages/PendingAPINews";
+
+
 
 export default function App() {
   return (
@@ -52,9 +56,11 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/pending-api-news" element={<PendingAPINews />} />
       </Routes>
 
-      {/* ToastContainer must be OUTSIDE <Routes> */}
+      {/* Mount BOTH if you want both libraries */}
+      <Toaster position="top-right" />
       <ToastContainer position="top-right" autoClose={3000} />
     </>
   );

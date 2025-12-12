@@ -139,7 +139,8 @@ export default function AddBlogs() {
       return;
     }
 
-    await API.post("/news", form);
+    await API.post("/blogs", form);
+
 
     alert("Blog added successfully!");
 
