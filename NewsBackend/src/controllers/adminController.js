@@ -7,23 +7,19 @@ export const loginAdmin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log("📩 Email received from frontend:", email);
-    console.log("🔑 Password received from frontend:", password);
+    console.log("📩 Admin login email:", email);
 
     const admin = await Admin.findOne({ email });
 
-    console.log("📘 Admin found in database:", admin);
-
     if (!admin) {
-      console.log("❌ No admin found with this email");
+      console.log("❌ Admin not found");
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
     const isMatch = await bcrypt.compare(password, admin.password);
-    console.log("🟦 Password match status:", isMatch);
 
     if (!isMatch) {
-      console.log("❌ Password incorrect");
+      console.log("❌ Incorrect password");
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
@@ -33,12 +29,11 @@ export const loginAdmin = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    console.log("✅ Login successful, sending token...");
+    console.log("✅ Admin login successful");
     res.json({ token });
 
   } catch (error) {
-    console.log("🔥 Server error:", error.message);
+    console.log("🔥 Admin login error:", error.message);
     res.status(500).json({ message: error.message });
   }
 };
-

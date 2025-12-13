@@ -5,20 +5,13 @@ const API = axios.create({
 });
 
 API.interceptors.request.use((config) => {
-  try {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("adminToken");
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("adminToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
-  } catch (err) {
-    console.warn("⚠ Storage blocked or unavailable:", err.message);
   }
-
   return config;
 });
-
-
 
 export default API;

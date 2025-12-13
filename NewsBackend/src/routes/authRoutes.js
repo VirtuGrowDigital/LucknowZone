@@ -1,12 +1,8 @@
 import express from "express";
-import {
-  register,
-  login,
-  getMe
-} from "../controllers/authController.js";
-
+import { register, login, getMe } from "../controllers/authController.js";
 import { loginAdmin } from "../controllers/adminController.js";
 import auth from "../middleware/auth.js";
+import Admin from "../models/Admin.js";
 
 const router = express.Router();
 
@@ -28,13 +24,15 @@ router.get("/me", auth, getMe);
 // ADMIN AUTH ROUTES
 // ===============================
 
-// Admin Login -> separate endpoint
+// Admin Login
 router.post("/admin/login", loginAdmin);
-import Admin from "../models/Admin.js";
 
+
+// TEMP CHECK ROUTE (remove later)
 router.get("/check-admin", async (req, res) => {
   const admin = await Admin.findOne({ email: "Animeshyadav70@gmail.com" });
   console.log("ADMIN FOUND IN DB:", admin);
   res.json(admin || { message: "No admin found" });
 });
+
 export default router;
