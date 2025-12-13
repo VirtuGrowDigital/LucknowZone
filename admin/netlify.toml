@@ -12,12 +12,14 @@
   [headers.values]
   Content-Security-Policy = """
     default-src 'self' https: http: data: blob:;
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: https://lucknowzone.netlify.app;
-    script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https: http: https://lucknowzone.netlify.app;
-    connect-src * data: blob: https: http:;
-    img-src * data: blob: https:;
-    style-src 'self' 'unsafe-inline' https:;
-    font-src 'self' https: data:;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: blob:;
+    script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https: http: blob:;
+    connect-src * https: http: wss: ws: blob:;
+    img-src * data: blob: https: http:;
+    style-src 'self' 'unsafe-inline' https: http:;
+    font-src 'self' data: https:;
+    worker-src blob: 'self';
+    media-src *;
     frame-src *;
     object-src 'none';
   """
