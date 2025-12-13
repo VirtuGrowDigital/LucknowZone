@@ -9,7 +9,7 @@ mongoose.connect(process.env.MONGO_URI).then(async () => {
   const hashed = await bcrypt.hash("Admin@123", 10);
 
   await Admin.create({
-    email: "animeshyadav70@gmail.com",
+    email: "Animeshyadav70@gmail.com",
     password: hashed,
   });
 
