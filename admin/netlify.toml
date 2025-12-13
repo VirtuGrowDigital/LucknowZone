@@ -10,11 +10,10 @@
 [[headers]]
   for = "/*"
   [headers.values]
-  # FULL CSP FIX
   Content-Security-Policy = """
     default-src 'self' https: http: data: blob:;
-    script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http:;
-    script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https: http:;
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: https://lucknowzone.netlify.app;
+    script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https: http: https://lucknowzone.netlify.app;
     connect-src * data: blob: https: http:;
     img-src * data: blob: https:;
     style-src 'self' 'unsafe-inline' https:;
