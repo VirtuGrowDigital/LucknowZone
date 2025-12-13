@@ -2,8 +2,7 @@
 // 1️⃣ Load ENV BEFORE ANYTHING ELSE
 // ============================================
 import dotenv from "dotenv";
-dotenv.config({ path: "./.env" });
-
+dotenv.config();
 // ============================================
 // 2️⃣ Now import all other dependencies
 // ============================================
