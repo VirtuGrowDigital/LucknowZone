@@ -30,6 +30,11 @@ router.get("/me", auth, getMe);
 
 // Admin Login -> separate endpoint
 router.post("/admin/login", loginAdmin);
+import Admin from "../models/Admin.js";
 
-
+router.get("/check-admin", async (req, res) => {
+  const admin = await Admin.findOne({ email: "Animeshyadav70@gmail.com" });
+  console.log("ADMIN FOUND IN DB:", admin);
+  res.json(admin || { message: "No admin found" });
+});
 export default router;
