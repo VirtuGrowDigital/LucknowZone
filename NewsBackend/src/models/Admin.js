@@ -8,4 +8,4 @@ const adminSchema = new mongoose.Schema({
   resetPasswordExpires: { type: Date },
 });
 
-export default mongoose.model("Admin", adminSchema);
+export default mongoose.model("Admin", adminSchema,"admins");
