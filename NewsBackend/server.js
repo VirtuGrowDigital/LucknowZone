@@ -19,7 +19,6 @@ import aiRoutes from "./src/routes/aiRoutes.js";
 import blogRoutes from "./src/routes/blogRoutes.js";
 import authRoutes from "./src/routes/authRoutes.js";
 
-
 // ============================================
 // 3️⃣ Connect to DB AFTER loading env
 // ============================================
@@ -29,16 +28,23 @@ connectDB();
 console.log("Loaded JWT SECRET:", process.env.JWT_SECRET);
 console.log("Loaded NEWS API KEY:", process.env.NEWS_API_KEY);
 
-
 // ============================================
 // 4️⃣ Start Express App
 // ============================================
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://lucknowzone.netlify.app",
+      "https://lucknowzone.netlify.app/",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 app.use(express.json({ limit: "25mb" }));
 app.use("/blogs", blogRoutes);
-
-
 
 // ============================================
 // 5️⃣ GLOBAL IMAGE PROXY
@@ -69,7 +75,6 @@ app.get("/proxy-image", async (req, res) => {
   }
 });
 
-
 // ============================================
 // 6️⃣ ROUTES
 // ============================================
@@ -80,7 +85,6 @@ app.use("/ai", aiRoutes);
 app.get("/", (req, res) => {
   res.send("News API Running...");
 });
-
 
 // ============================================
 // 7️⃣ START SERVER
