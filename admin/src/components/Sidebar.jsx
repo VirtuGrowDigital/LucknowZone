@@ -7,7 +7,8 @@ import {
   FaNewspaper,
   FaBars,
   FaTimes,
-  FaBolt,   // Icon for ticker
+  FaBolt,
+  FaBuffer,  // Icon for ticker
   // FaTag,  // Optional alternative
 } from "react-icons/fa";
 import logo from "../assets/Images/Logo.png";
@@ -20,7 +21,7 @@ export default function Sidebar() {
     { name: "Dashboard", icon: <FaHome />, path: "/dashboard" },
     { name: "Add News", icon: <FaNewspaper />, path: "/add-news" },
     { name: "Add Blog", icon: <FaBlog />, path: "/add-blog" },
-    { name: "Pending API News", path: "/pending-api-news" },
+    { name: "Pending API News",icon: <FaBuffer/>, path: "/pending-api-news" },
 
 
     // ✅ NEW TICKER MENU ITEM

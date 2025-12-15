@@ -61,7 +61,7 @@ export const importExternalNews = async (req, res) => {
         title: r.title,
         description: r.description || "",
         image: r.image_url,
-        category: "LZN",
+        category: "New",
         region, // 🔥 CORRECT FIX — region saved as local/national/international
         isAPI: true,
         status: "pending",
