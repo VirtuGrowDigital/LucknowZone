@@ -38,7 +38,8 @@ app.use(
       "https://lucknowzone.netlify.app",
       "https://lucknowzone.netlify.app/",
     ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
+     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
   })
 );

@@ -72,7 +72,7 @@ export default function PendingAPINews() {
 
         {/* HEADER */}
         <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 relative">
-          <h2 className="text-xl md:text-2xl font-semibold mb-3 md:mb-0">
+          <h2 className="text-xl md:text-2xl text-shadow-white font-semibold mb-3 md:mb-0">
             Pending API News
           </h2>
 
