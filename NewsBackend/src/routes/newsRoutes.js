@@ -9,13 +9,11 @@ import {
   toggleHidden,
   getPaginatedNews,
 
-  // API news
   importExternalNews,
   getPendingNews,
   approveNews,
   rejectNews,
 
-  // Breaking news
   getBreakingNews,
   addBreakingNews,
   deleteBreakingNews,
@@ -26,24 +24,12 @@ import {
 const router = express.Router();
 
 /* ===========================
-   📰 NEWS
-=========================== */
-
-router.get("/", getAllNews);
-router.post("/", auth, createNews);
-router.put("/:id", auth, updateNews);
-router.delete("/:id", auth, deleteNews);
-router.put("/toggle/:id", auth, toggleHidden);
-router.get("/paginated", getPaginatedNews);
-
-/* ===========================
    📥 API NEWS (newsdata.io)
 =========================== */
 
-// ✅ ONE importer (region handled via query)
+// specific routes FIRST 🚨
 router.get("/import", importExternalNews);
 router.get("/by-region", getNewsByRegion);
-
 
 /* ===========================
    🕒 PENDING API NEWS
@@ -61,5 +47,18 @@ router.get("/breaking", getBreakingNews);
 router.post("/breaking", auth, addBreakingNews);
 router.delete("/breaking/:id", auth, deleteBreakingNews);
 router.patch("/breaking/:id/toggle", auth, toggleBreakingNews);
+
+/* ===========================
+   📰 NEWS
+=========================== */
+
+router.get("/", getAllNews);
+router.get("/paginated", getPaginatedNews);
+router.post("/", auth, createNews);
+
+// 👇 dynamic routes MUST COME LAST
+router.put("/:id", auth, updateNews);
+router.delete("/:id", auth, deleteNews);
+router.put("/toggle/:id", auth, toggleHidden);
 
 export default router;
