@@ -60,7 +60,12 @@ app.use(
 );
 
 // 🚨 REQUIRED for preflight requests
-app.options("*", cors());
+app.use((req, res, next) => {
+  if (req.method === "OPTIONS") {
+    return cors()(req, res, next);
+  }
+  next();
+});
 
 // ============================================
 // 6️⃣ Middlewares
