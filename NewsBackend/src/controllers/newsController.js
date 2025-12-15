@@ -3,6 +3,65 @@ import BreakingNews from "../models/BreakingNews.js";
 import axios from "axios";
 
 /* =========================================================
+   📍 LUCKNOW KEYWORD TARGETING
+   ========================================================= */
+
+const LUCKNOW_KEYWORDS = [
+  "lucknow",
+  "lko",
+  "hazratganj",
+  "aminabad",
+  "chowk",
+  "charbagh",
+  "alambagh",
+  "gomti nagar",
+  "gomti nagar extension",
+  "patrakarpuram",
+  "indira nagar",
+  "munshi pulia",
+  "jankipuram",
+  "aliganj",
+  "ashiyana",
+  "krishna nagar",
+  "sarojini nagar",
+  "mohanlalganj",
+  "bakshi ka talab",
+  "bkt",
+  "kakori",
+  "lucknow police",
+  "lmc",
+  "lda",
+  "kgmu",
+  "lucknow university",
+  "iim lucknow",
+  "ekana stadium",
+  "lulu mall",
+  "phoenix palassio",
+];
+
+const BLOCK_KEYWORDS = [
+  "kanpur",
+  "varanasi",
+  "prayagraj",
+  "agra",
+  "meerut",
+  "noida",
+  "ghaziabad",
+];
+
+const lucknowScore = (article) => {
+  const text = `
+    ${article.title || ""}
+    ${article.description || ""}
+    ${article.content || ""}
+  `.toLowerCase();
+
+  if (BLOCK_KEYWORDS.some((b) => text.includes(b))) return 0;
+
+  return LUCKNOW_KEYWORDS.filter((k) => text.includes(k)).length;
+};
+
+/* =========================================================
    ✅ GET ALL APPROVED NEWS
    ========================================================= */
 export const getAllNews = async (req, res) => {
@@ -36,7 +95,7 @@ export const importExternalNews = async (req, res) => {
 
     // 🔥 FIXED: Generate correct API query based on region
     let query = "world";
-    if (region === "local") query = "local";
+    if (region === "local") query = "uttar pradesh OR lucknow OR lko";
     if (region === "national") query = "india";
     if (region === "international") query = "world";
 
@@ -45,13 +104,24 @@ export const importExternalNews = async (req, res) => {
     console.log("🌐 Fetching:", url);
 
     const response = await axios.get(url);
-    const results = response.data?.results || [];
+    let results = response.data?.results || [];
+
+    // ✅ APPLY LUCKNOW FILTER ONLY FOR LOCAL NEWS
+    if (region === "local") {
+      results = results
+        .map((r) => ({ ...r, score: lucknowScore(r) }))
+        .filter((r) => r.score > 0)
+        .sort((a, b) => b.score - a.score);
+    }
 
     if (!results.length) return res.json({ success: true, imported: 0 });
 
     // Remove DB duplicates
     const titles = results.map((r) => r.title);
-    const existing = await News.find({ title: { $in: titles } }, { title: 1 });
+    const existing = await News.find({
+      title: { $in: titles },
+      region,
+    });
 
     const existingSet = new Set(existing.map((e) => e.title));
 
@@ -83,7 +153,6 @@ export const importExternalNews = async (req, res) => {
     res.status(500).json({ error: "API import failed" });
   }
 };
-
 
 /* =========================================================
    🕒 GET PENDING API NEWS (ADMIN)
@@ -117,7 +186,6 @@ export const getNewsByRegion = async (req, res) => {
     res.status(500).json({ error: "Failed to load region news" });
   }
 };
-
 
 /* =========================================================
    ✅ APPROVE / ❌ REJECT
@@ -158,7 +226,8 @@ export const updateNews = async (req, res) => {
   if (!news) return res.status(404).json({ error: "Not found" });
 
   // ❗ Still block API edits because you said you don't want to modify API content
-  if (news.isAPI) return res.status(403).json({ error: "API news cannot be edited" });
+  if (news.isAPI)
+    return res.status(403).json({ error: "API news cannot be edited" });
 
   const updated = await News.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -186,7 +255,6 @@ export const toggleHidden = async (req, res) => {
 
   res.json({ success: true });
 };
-
 
 /* =========================================================
    📄 PAGINATION
