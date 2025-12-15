@@ -107,93 +107,149 @@ export default function AddNews() {
 
   return (
     <DashboardLayout>
-      <div className="flex justify-center mt-10 px-3">
+      <div className="flex justify-center px-3 sm:px-6 py-6 sm:py-10">
         <form
           onSubmit={handleSubmit}
-          className="bg-white/90 backdrop-blur-xl w-full max-w-2xl shadow-2xl rounded-2xl p-10 border border-gray-200"
+          className="
+          w-full max-w-3xl
+          bg-white/90 backdrop-blur-xl
+          shadow-xl sm:shadow-2xl
+          rounded-2xl
+          p-5 sm:p-8 md:p-10
+          border border-gray-200
+        "
         >
-          <h1 className="text-3xl font-extrabold mb-8 text-center text-gray-800">
-            📰 Publish News Article
-          </h1>
+          {/* Header */}
+          <div className="mb-6 sm:mb-8 text-center">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800">
+              📰 Publish News Article
+            </h1>
+            <p className="text-gray-500 text-sm mt-1">
+              Add headline, image & category to publish
+            </p>
+          </div>
 
           {/* Title */}
-          <label className="font-semibold text-gray-700">News Title</label>
-          <input
-            type="text"
-            name="title"
-            placeholder="Enter headline"
-            className="w-full border p-3 rounded-xl mb-4 shadow-sm focus:ring-2 focus:ring-red-600 outline-none"
-            value={form.title}
-            onChange={handleChange}
-            required
-          />
+          <div className="mb-4">
+            <label className="font-semibold text-gray-700 block mb-1">
+              News Title
+            </label>
+            <input
+              type="text"
+              name="title"
+              placeholder="Enter headline"
+              className="
+              w-full border p-3 rounded-xl
+              shadow-sm focus:ring-2 focus:ring-red-600
+              outline-none text-sm sm:text-base
+            "
+              value={form.title}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
           {/* Description */}
-          <label className="font-semibold text-gray-700">Short Description</label>
-          <textarea
-            name="description"
-            placeholder="Write a short summary..."
-            rows="4"
-            className="w-full border p-3 rounded-xl mb-5 shadow-sm focus:ring-2 focus:ring-red-600 outline-none"
-            value={form.description}
-            onChange={handleChange}
-            required
-          />
+          <div className="mb-5">
+            <label className="font-semibold text-gray-700 block mb-1">
+              Short Description
+            </label>
+            <textarea
+              name="description"
+              placeholder="Write a short summary..."
+              rows="4"
+              className="
+              w-full border p-3 rounded-xl
+              shadow-sm focus:ring-2 focus:ring-red-600
+              outline-none resize-none
+              text-sm sm:text-base
+            "
+              value={form.description}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
           {/* Category */}
-          <label className="font-semibold text-gray-700">Category</label>
-          <select
-            name="category"
-            className="w-full border p-3 rounded-xl mb-5 shadow-sm focus:ring-2 focus:ring-red-600 outline-none"
-            value={form.category}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select Category</option>
-            <option value="Local">Local</option>
-            <option value="Politics">Politics</option>
-            <option value="Sports">Sports</option>
-            <option value="Tech">Tech</option>
-            <option value="Health">Health</option>
-            <option value="Business">Business</option>
-            <option value="Entertainment">Entertainment</option>
-            <option value="Top Stories">Top Stories</option>
-          </select>
+          <div className="mb-5">
+            <label className="font-semibold text-gray-700 block mb-1">
+              Category
+            </label>
+            <select
+              name="category"
+              className="
+              w-full border p-3 rounded-xl
+              shadow-sm focus:ring-2 focus:ring-red-600
+              outline-none text-sm sm:text-base
+            "
+              value={form.category}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Category</option>
+              <option value="Local">Local</option>
+              <option value="Politics">Politics</option>
+              <option value="Sports">Sports</option>
+              <option value="Tech">Tech</option>
+              <option value="Health">Health</option>
+              <option value="Business">Business</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Top Stories">Top Stories</option>
+            </select>
+          </div>
 
-          {/* Drag & Drop Upload */}
-          <label className="font-semibold text-gray-700">News Image</label>
+          {/* Image Upload */}
+          <div className="mb-4">
+            <label className="font-semibold text-gray-700 block mb-2">
+              News Image
+            </label>
 
-          <div
-            {...getRootProps()}
-            className={`border-2 border-dashed rounded-xl p-4 text-center mb-4 cursor-pointer transition ${
-              isDragActive
-                ? "border-red-500 bg-red-50"
-                : "border-gray-300 bg-gray-50"
-            }`}
-          >
-            <input {...getInputProps()} />
-            <p className="text-sm text-gray-600">
-              Drag & drop or click to upload an image
-            </p>
+            <div
+              {...getRootProps()}
+              className={`
+              border-2 border-dashed rounded-xl
+              p-4 sm:p-6
+              text-center cursor-pointer
+              transition-all
+              ${
+                isDragActive
+                  ? "border-red-500 bg-red-50"
+                  : "border-gray-300 bg-gray-50 hover:bg-gray-100"
+              }
+            `}
+            >
+              <input {...getInputProps()} />
+              <p className="text-sm text-gray-600">
+                Drag & drop or tap to upload image
+              </p>
+              <p className="text-xs text-gray-400 mt-1">
+                JPG / PNG · Auto compressed
+              </p>
+            </div>
           </div>
 
           {/* URL Fallback */}
           <input
             type="text"
             name="image"
-            placeholder="Paste image URL (optional)"
-            className="w-full border p-3 rounded-xl mb-4 shadow-sm"
+            placeholder="Or paste image URL (optional)"
+            className="
+            w-full border p-3 rounded-xl mb-4
+            shadow-sm text-sm sm:text-base
+          "
             value={form.image}
             onChange={handleChange}
           />
 
-          {/* Upload Status */}
+          {/* Status */}
           {uploading && (
-            <p className="text-blue-600 mb-3 font-medium">Processing image...</p>
+            <p className="text-blue-600 mb-3 font-medium text-sm">
+              Processing image...
+            </p>
           )}
 
           {uploadSuccess && (
-            <p className="text-green-600 mb-3 font-semibold">
+            <p className="text-green-600 mb-3 font-semibold text-sm">
               Image ready & compressed!
             </p>
           )}
@@ -204,15 +260,29 @@ export default function AddNews() {
               <img
                 src={form.image}
                 alt="preview"
-                className="w-full rounded-xl shadow border"
+                className="
+                w-full max-h-[300px] object-cover
+                rounded-xl shadow border
+              "
               />
             </div>
           )}
 
-          {/* Submit */}
-          <button className="bg-red-600 hover:bg-red-700 text-white font-bold w-full py-3 rounded-xl shadow-lg text-lg transition">
-            Publish News 🚀
-          </button>
+          {/* Submit (Sticky on mobile) */}
+          <div className="sticky bottom-0 bg-white pt-3 sm:static sm:bg-transparent">
+            <button
+              className="
+              bg-red-600 hover:bg-red-700
+              text-white font-bold
+              w-full py-3
+              rounded-xl shadow-lg
+              text-base sm:text-lg
+              transition
+            "
+            >
+              Publish News 🚀
+            </button>
+          </div>
         </form>
       </div>
     </DashboardLayout>

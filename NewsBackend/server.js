@@ -37,6 +37,10 @@ app.use(
       "http://localhost:5173",
       "https://lucknowzone.netlify.app",
       "https://lucknowzone.netlify.app/",
+      "https://lucknowzoneadmin.netlify.app",
+      "https://lucknowzoneadmin.netlify.app/",
+
+
     ],
     methods: ["GET", "POST", "PUT", "DELETE","PATCH"],
      allowedHeaders: ["Content-Type", "Authorization"],
