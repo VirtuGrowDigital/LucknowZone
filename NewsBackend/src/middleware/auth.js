@@ -2,26 +2,25 @@ import jwt from "jsonwebtoken";
 
 const auth = (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization;
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({ error: "JWT secret not configured" });
+    }
 
+    const authHeader = req.headers.authorization;
     if (!authHeader) {
       return res.status(401).json({ error: "No authorization header provided" });
     }
 
-    // Expected format: "Bearer <token>"
     const token = authHeader.split(" ")[1];
-
     if (!token) {
       return res.status(401).json({ error: "Token missing" });
     }
 
-    // Verify token using your single secret
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Attach decoded user/admin info
     req.user = {
       id: decoded.id,
-      email: decoded.email,
+      email: decoded.email || null,
       role: decoded.role || "user",
     };
 

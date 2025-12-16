@@ -18,6 +18,10 @@ import newsRoutes from "./src/routes/newsRoutes.js";
 import aiRoutes from "./src/routes/aiRoutes.js";
 import blogRoutes from "./src/routes/blogRoutes.js";
 import authRoutes from "./src/routes/authRoutes.js";
+import savedRoutes from "./src/routes/savedRoutes.js";
+
+app.use("/saved", savedRoutes);
+
 
 // ============================================
 // 3️⃣ Connect DB

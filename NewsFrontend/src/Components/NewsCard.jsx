@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FaRegBookmark, FaBookmark, FaShareAlt } from "react-icons/fa";
 import API from "../utils/api";
 import toast from "react-hot-toast";
+import confetti from "canvas-confetti";
 import { useNavigate } from "react-router-dom";
 
 export default function NewsCard({ item = {} }) {
@@ -22,10 +23,16 @@ export default function NewsCard({ item = {} }) {
     isSaved = false,
   } = item;
 
+  // Unique save ID (ensures API news, blogs, admin news all save correctly)
+  const saveId =
+    _id ||
+    slug ||
+    title.replace(/\s+/g, "-").toLowerCase() + "-" + Math.floor(Math.random() * 9999);
+
   const [saved, setSaved] = useState(isSaved);
   const [animating, setAnimating] = useState(false);
 
-  // -------- TIME AGO --------
+  /* ---------------------- TIME AGO ---------------------- */
   const timeAgo = (() => {
     const diff = (Date.now() - new Date(createdAt)) / 1000;
     if (diff < 3600) return `${Math.floor(diff / 60)} mins ago`;
@@ -33,7 +40,7 @@ export default function NewsCard({ item = {} }) {
     return new Date(createdAt).toLocaleDateString();
   })();
 
-  // -------- CATEGORY PILL --------
+  /* ---------------------- CATEGORY PILL ---------------------- */
   let pillLabel = category;
   let pillColor = "bg-red-500";
 
@@ -45,14 +52,15 @@ export default function NewsCard({ item = {} }) {
         ? "National"
         : region === "international"
         ? "World"
-        : "New";
+        : "News";
+
     pillColor = "bg-blue-600";
   } else {
     pillLabel = category === "Blog" ? "Blog" : "Admin";
     pillColor = category === "Blog" ? "bg-purple-600" : "bg-green-600";
   }
 
-  // -------- SAVE / UNSAVE --------
+  /* ---------------------- SAVE / UNSAVE ---------------------- */
   const handleSave = async () => {
     const token = localStorage.getItem("token");
 
@@ -64,22 +72,36 @@ export default function NewsCard({ item = {} }) {
 
     try {
       setAnimating(true);
-      await API.post(`/saved/${_id}`);
 
-      setSaved((prev) => {
-        toast.success(
-          prev ? "Removed from saved" : "Saved to your profile"
-        );
-        return !prev;
-      });
-    } catch {
-      toast.error("Something went wrong");
+      if (!saved) {
+        // ---------------- SAVE ARTICLE ----------------
+        await API.post(`/saved/${saveId}`, { article: item });
+
+        // Confetti burst
+        confetti({
+          particleCount: 40,
+          spread: 40,
+          origin: { y: 0.85 },
+        });
+
+        toast.success("Saved to your profile");
+        setSaved(true);
+      } else {
+        // ---------------- UNSAVE ARTICLE ----------------
+        await API.delete(`/saved/${saveId}`);
+
+        toast("Removed from saved", { icon: "❌" });
+        setSaved(false);
+      }
+    } catch (error) {
+      console.error("SAVE ERROR:", error);
+      toast.error("Could not save article");
     } finally {
       setTimeout(() => setAnimating(false), 300);
     }
   };
 
-  // -------- SHARE --------
+  /* ---------------------- SHARE ---------------------- */
   const handleShare = async () => {
     const url = `${window.location.origin}/blog/${slug || _id}`;
 
@@ -91,8 +113,16 @@ export default function NewsCard({ item = {} }) {
     }
   };
 
+  /* ---------------------- UI ---------------------- */
   return (
-    <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 relative">
+    <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 relative overflow-hidden">
+
+      {/* SAVED BADGE */}
+      {saved && (
+        <span className="absolute top-3 right-3 bg-red-600 text-white text-xs px-3 py-1 rounded-full shadow-md animate-fadeIn">
+          Saved
+        </span>
+      )}
 
       {/* CATEGORY PILL */}
       <span
@@ -104,47 +134,52 @@ export default function NewsCard({ item = {} }) {
       {/* IMAGE */}
       <div
         onClick={() => navigate(`/blog/${slug || _id}`)}
-        className="relative h-48 w-full overflow-hidden rounded-t-2xl cursor-pointer"
+        className="relative h-48 w-full overflow-hidden rounded-t-2xl cursor-pointer group"
       >
         {image ? (
-          <img src={image} alt={title} className="h-full w-full object-cover" />
+          <img
+            src={image}
+            alt={title}
+            className="h-full w-full object-cover group-hover:scale-105 transition duration-500"
+          />
         ) : (
           <div className="h-full w-full bg-gray-200 animate-pulse" />
         )}
-
-        <h2 className="absolute bottom-3 left-3 text-white text-xl font-semibold drop-shadow-md">
-          {category}
-        </h2>
       </div>
 
-      {/* BODY */}
+      {/* CONTENT */}
       <div className="p-5">
-        <h3 className="text-lg font-semibold leading-tight">{title}</h3>
+        <h3 className="text-lg font-semibold leading-tight line-clamp-2">
+          {title}
+        </h3>
+
         <p className="text-sm text-gray-600 mt-2 line-clamp-2">
           {description}
         </p>
 
         <p className="text-xs text-gray-400 mt-4">{timeAgo}</p>
 
-        {/* ACTIONS */}
+        {/* ACTION BUTTONS */}
         <div className="flex justify-end items-center gap-4 mt-3 text-gray-500">
+          {/* SAVE BUTTON */}
           <button
             onClick={(e) => {
               e.stopPropagation();
               handleSave();
             }}
-            className={`transition-transform ${
+            className={`transition-all duration-300 ${
               animating ? "scale-125" : "scale-100"
-            }`}
+            } ${saved ? "text-red-600 drop-shadow-md" : ""}`}
             title="Save"
           >
             {saved ? (
-              <FaBookmark className="text-red-500 animate-pulse" />
+              <FaBookmark className="animate-pulse" />
             ) : (
               <FaRegBookmark className="hover:text-black" />
             )}
           </button>
 
+          {/* SHARE BUTTON */}
           <button
             onClick={(e) => {
               e.stopPropagation();
