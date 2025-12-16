@@ -86,12 +86,15 @@ app.use("/ai", aiRoutes);
 app.get("/proxy-image", async (req, res) => {
   try {
     const imageUrl = req.query.url;
+
+    // If no URL, return fallback image (200 OK)
     if (!imageUrl) {
-      return res.status(400).json({ error: "Image URL required" });
+      return res.status(200).sendFile("Fallback.png", { root: "public" });
     }
 
     const response = await axios.get(imageUrl, {
       responseType: "arraybuffer",
+      timeout: 8000,
       headers: {
         "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120 Safari/537.36",
@@ -101,14 +104,17 @@ app.get("/proxy-image", async (req, res) => {
       validateStatus: () => true,
     });
 
+    // If image fetched successfully
     if (response.status >= 200 && response.status < 300) {
-      res.set("Content-Type", response.headers["content-type"]);
-      return res.send(response.data);
+      res.set("Content-Type", response.headers["content-type"] || "image/jpeg");
+      return res.status(200).send(response.data);
     }
 
-    return res.status(404).send("Image not found");
+    // If fetch failed → fallback image (still 200)
+    return res.status(200).sendFile("Fallback.png", { root: "public" });
   } catch (err) {
-    return res.status(500).send("Image proxy failed");
+    // Any error → fallback image (still 200)
+    return res.status(200).sendFile("Fallback.png", { root: "public" });
   }
 });
 

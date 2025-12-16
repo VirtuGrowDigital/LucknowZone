@@ -19,6 +19,7 @@ import {
   deleteBreakingNews,
   toggleBreakingNews,
   getNewsByRegion,
+  undoApproveNews,
 } from "../controllers/newsController.js";
 
 const router = express.Router();
@@ -38,6 +39,7 @@ router.get("/by-region", getNewsByRegion);
 router.get("/pending", getPendingNews);
 router.patch("/:id/approve", approveNews);
 router.patch("/:id/reject", rejectNews);
+router.patch("/:id/undo", undoApproveNews);
 
 /* ===========================
    🔥 BREAKING NEWS
