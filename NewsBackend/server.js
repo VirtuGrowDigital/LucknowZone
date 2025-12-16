@@ -20,7 +20,7 @@ import blogRoutes from "./src/routes/blogRoutes.js";
 import authRoutes from "./src/routes/authRoutes.js";
 import savedRoutes from "./src/routes/savedRoutes.js";
 
-app.use("/saved", savedRoutes);
+
 
 
 // ============================================
@@ -76,6 +76,7 @@ app.use((req, res, next) => {
 // ============================================
 app.use(express.json({ limit: "25mb" }));
 
+
 // ============================================
 // 7️⃣ ROUTES
 // ============================================
@@ -83,6 +84,7 @@ app.use("/auth", authRoutes);
 app.use("/news", newsRoutes);
 app.use("/blogs", blogRoutes);
 app.use("/ai", aiRoutes);
+app.use("/saved", savedRoutes);
 
 // ============================================
 // 8️⃣ GLOBAL IMAGE PROXY
