@@ -26,10 +26,9 @@ import {
 const router = express.Router();
 
 /* ===========================
-   📥 API NEWS (newsdata.io)
+   📥 API NEWS
 =========================== */
 
-// specific routes FIRST 🚨
 router.get("/import", importExternalNews);
 router.get("/by-region", getNewsByRegion);
 
@@ -41,21 +40,9 @@ router.get("/pending", getPendingNews);
 router.patch("/:id/approve", approveNews);
 router.patch("/:id/reject", rejectNews);
 router.patch("/:id/undo", undoApproveNews);
-// GET single news by ID
-router.get("/:id", async (req, res) => {
-  try {
-    const news = await News.findById(req.params.id);
-    if (!news) return res.status(404).json({ error: "News not found" });
-
-    res.json(news);
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
 
 /* ===========================
-   🔥 BREAKING NEWS
+   🔥 BREAKING NEWS (MUST COME FIRST)
 =========================== */
 
 router.get("/breaking", getBreakingNews);
@@ -64,14 +51,33 @@ router.delete("/breaking/:id", auth, deleteBreakingNews);
 router.patch("/breaking/:id/toggle", auth, toggleBreakingNews);
 
 /* ===========================
-   📰 NEWS
+   🔍 SINGLE NEWS (AMP PAGE)
+=========================== */
+
+router.get("/:id", async (req, res) => {
+  try {
+    if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ error: "Invalid ID" });
+    }
+
+    const news = await News.findById(req.params.id);
+    if (!news) return res.status(404).json({ error: "News not found" });
+
+    res.json(news);
+  } catch (err) {
+    console.error("Get news error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+
+/* ===========================
+   📰 NEWS LIST & CRUD
 =========================== */
 
 router.get("/", getAllNews);
 router.get("/paginated", getPaginatedNews);
 router.post("/", auth, createNews);
 
-// 👇 dynamic routes MUST COME LAST
 router.put("/:id", auth, updateNews);
 router.delete("/:id", auth, deleteNews);
 router.put("/toggle/:id", auth, toggleHidden);
