@@ -7,18 +7,46 @@ import axios from "axios";
    ========================================================= */
 
 const LUCKNOW_KEYWORDS = [
-  "lucknow", "lko", "hazratganj", "aminabad", "chowk",
-  "charbagh", "alambagh", "gomti nagar", "gomti nagar extension",
-  "patrakarpuram", "indira nagar", "munshi pulia", "jankipuram",
-  "aliganj", "ashiyana", "krishna nagar", "sarojini nagar",
-  "mohanlalganj", "bakshi ka talab", "bkt", "kakori",
-  "lucknow police", "lmc", "lda", "kgmu", "lucknow university",
-  "iim lucknow", "ekana stadium", "lulu mall", "phoenix palassio",
+  "lucknow",
+  "lko",
+  "hazratganj",
+  "aminabad",
+  "chowk",
+  "charbagh",
+  "alambagh",
+  "gomti nagar",
+  "gomti nagar extension",
+  "patrakarpuram",
+  "indira nagar",
+  "munshi pulia",
+  "jankipuram",
+  "aliganj",
+  "ashiyana",
+  "krishna nagar",
+  "sarojini nagar",
+  "mohanlalganj",
+  "bakshi ka talab",
+  "bkt",
+  "kakori",
+  "lucknow police",
+  "lmc",
+  "lda",
+  "kgmu",
+  "lucknow university",
+  "iim lucknow",
+  "ekana stadium",
+  "lulu mall",
+  "phoenix palassio",
 ];
 
 const BLOCK_KEYWORDS = [
-  "kanpur", "varanasi", "prayagraj", "agra",
-  "meerut", "noida", "ghaziabad",
+  "kanpur",
+  "varanasi",
+  "prayagraj",
+  "agra",
+  "meerut",
+  "noida",
+  "ghaziabad",
 ];
 
 const lucknowScore = (article) => {
@@ -258,30 +286,61 @@ export const getPaginatedNews = async (req, res) => {
 };
 
 /* =========================================================
-   🔥 BREAKING NEWS
+   🔥 BREAKING NEWS (FIXED & SAFE)
    ========================================================= */
+
 export const getBreakingNews = async (req, res) => {
-  const breaking = await BreakingNews.find().sort({ createdAt: -1 });
-  res.json({ success: true, breaking });
+  try {
+    const breaking = await BreakingNews.find({ active: true }).sort({
+      createdAt: -1,
+    });
+
+    res.json({ success: true, breaking });
+  } catch (err) {
+    console.error("❌ Breaking news fetch error:", err);
+    res.status(500).json({
+      success: false,
+      error: "Failed to load breaking news",
+    });
+  }
 };
 
 export const addBreakingNews = async (req, res) => {
-  const item = await BreakingNews.create({
-    text: req.body.text,
-    active: true,
-    createdAt: new Date(),
-  });
-  res.json({ success: true, item });
+  try {
+    const item = await BreakingNews.create({
+      text: req.body.text,
+      active: true,
+      createdAt: new Date(),
+    });
+
+    res.json({ success: true, item });
+  } catch (err) {
+    console.error("❌ Add breaking news error:", err);
+    res.status(500).json({ success: false });
+  }
 };
 
 export const deleteBreakingNews = async (req, res) => {
-  await BreakingNews.findByIdAndDelete(req.params.id);
-  res.json({ success: true });
+  try {
+    await BreakingNews.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    console.error("❌ Delete breaking news error:", err);
+    res.status(500).json({ success: false });
+  }
 };
 
 export const toggleBreakingNews = async (req, res) => {
-  const item = await BreakingNews.findById(req.params.id);
-  item.active = !item.active;
-  await item.save();
-  res.json({ success: true });
+  try {
+    const item = await BreakingNews.findById(req.params.id);
+    if (!item) return res.status(404).json({ error: "Not found" });
+
+    item.active = !item.active;
+    await item.save();
+
+    res.json({ success: true, item });
+  } catch (err) {
+    console.error("❌ Toggle breaking news error:", err);
+    res.status(500).json({ success: false });
+  }
 };
