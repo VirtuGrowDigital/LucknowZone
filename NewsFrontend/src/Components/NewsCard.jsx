@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { FaRegBookmark, FaBookmark, FaShareAlt } from "react-icons/fa";
 import API from "../utils/api";
 import toast from "react-hot-toast";
-import confetti from "canvas-confetti";
 import { useNavigate } from "react-router-dom";
 
 export default function NewsCard({ item = {} }) {
@@ -21,20 +20,12 @@ export default function NewsCard({ item = {} }) {
     region = null,
     slug,
     isSaved = false,
-    type = "news",
   } = item;
-
-  const saveId =
-    _id ||
-    slug ||
-    title.replace(/\s+/g, "-").toLowerCase() +
-      "-" +
-      Math.floor(Math.random() * 9999);
 
   const [saved, setSaved] = useState(isSaved);
   const [animating, setAnimating] = useState(false);
 
-  /* ---------------- TIME AGO ---------------- */
+  /* -------- TIME AGO -------- */
   const timeAgo = (() => {
     const diff = (Date.now() - new Date(createdAt)) / 1000;
     if (diff < 3600) return `${Math.floor(diff / 60)} mins ago`;
@@ -42,7 +33,7 @@ export default function NewsCard({ item = {} }) {
     return new Date(createdAt).toLocaleDateString();
   })();
 
-  /* ---------------- CATEGORY PILL ---------------- */
+  /* -------- CATEGORY PILL -------- */
   let pillLabel = category;
   let pillColor = "bg-red-500";
 
@@ -54,25 +45,17 @@ export default function NewsCard({ item = {} }) {
         ? "National"
         : region === "international"
         ? "World"
-        : "News";
+        : "New";
     pillColor = "bg-blue-600";
   } else {
     pillLabel = category === "Blog" ? "Blog" : "Admin";
     pillColor = category === "Blog" ? "bg-purple-600" : "bg-green-600";
   }
 
-  /* ---------------- OPEN CARD ---------------- */
-  const handleOpen = () => {
-    if (type === "blog" || category === "Blog") {
-      navigate(`/blog/${slug || _id}`);
-    } else {
-      navigate(`/news/${_id}`);
-    }
-  };
-
-  /* ---------------- SAVE ---------------- */
+  /* -------- SAVE / UNSAVE -------- */
   const handleSave = async () => {
     const token = localStorage.getItem("token");
+
     if (!token) {
       toast.error("Please login to save articles");
       window.dispatchEvent(new Event("open-login"));
@@ -81,36 +64,22 @@ export default function NewsCard({ item = {} }) {
 
     try {
       setAnimating(true);
+      await API.post(`/saved/${_id}`);
 
-      if (!saved) {
-        await API.post(`/saved/${saveId}`, { article: item });
-
-        confetti({
-          particleCount: 40,
-          spread: 40,
-          origin: { y: 0.85 },
-        });
-
-        toast.success("Saved to your profile");
-        setSaved(true);
-      } else {
-        await API.delete(`/saved/${saveId}`);
-        toast("Removed from saved", { icon: "❌" });
-        setSaved(false);
-      }
+      setSaved((prev) => {
+        toast.success(prev ? "Removed from saved" : "Saved to your profile");
+        return !prev;
+      });
     } catch {
-      toast.error("Could not save article");
+      toast.error("Something went wrong");
     } finally {
       setTimeout(() => setAnimating(false), 300);
     }
   };
 
-  /* ---------------- SHARE ---------------- */
+  /* -------- SHARE -------- */
   const handleShare = async () => {
-    const url =
-      type === "blog" || category === "Blog"
-        ? `${window.location.origin}/blog/${slug || _id}`
-        : `${window.location.origin}/news/${_id}`;
+    const url = `${window.location.origin}/news/${_id}`;
 
     if (navigator.share) {
       navigator.share({ title, text: description, url });
@@ -121,21 +90,18 @@ export default function NewsCard({ item = {} }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-md hover:shadow-xl transition border relative overflow-hidden">
-      {saved && (
-        <span className="absolute top-3 right-3 bg-red-600 text-white text-xs px-3 py-1 rounded-full shadow">
-          Saved
-        </span>
-      )}
+    <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-100 relative">
 
+      {/* CATEGORY PILL */}
       <span
         className={`absolute top-3 -left-3 z-20 text-white text-xs px-3 py-1 rounded-full shadow ${pillColor}`}
       >
         {pillLabel}
       </span>
 
+      {/* IMAGE */}
       <div
-        onClick={handleOpen}
+        onClick={() => navigate(`/news/${_id}`)}
         className="relative h-48 w-full overflow-hidden rounded-t-2xl cursor-pointer"
       >
         {image ? (
@@ -143,24 +109,37 @@ export default function NewsCard({ item = {} }) {
         ) : (
           <div className="h-full w-full bg-gray-200 animate-pulse" />
         )}
+
+        <h2 className="absolute bottom-3 left-3 text-white text-xl font-semibold drop-shadow-md">
+          {category}
+        </h2>
       </div>
 
+      {/* BODY */}
       <div className="p-5">
-        <h3 className="text-lg font-semibold line-clamp-2">{title}</h3>
+        <h3 className="text-lg font-semibold leading-tight">{title}</h3>
         <p className="text-sm text-gray-600 mt-2 line-clamp-2">
           {description}
         </p>
+
         <p className="text-xs text-gray-400 mt-4">{timeAgo}</p>
 
-        <div className="flex justify-end gap-4 mt-3 text-gray-500">
+        <div className="flex justify-end items-center gap-4 mt-3 text-gray-500">
           <button
             onClick={(e) => {
               e.stopPropagation();
               handleSave();
             }}
-            className={`transition ${animating ? "scale-125" : ""}`}
+            className={`transition-transform ${
+              animating ? "scale-125" : "scale-100"
+            }`}
+            title="Save"
           >
-            {saved ? <FaBookmark className="text-red-600" /> : <FaRegBookmark />}
+            {saved ? (
+              <FaBookmark className="text-red-500 animate-pulse" />
+            ) : (
+              <FaRegBookmark className="hover:text-black" />
+            )}
           </button>
 
           <button
@@ -168,8 +147,9 @@ export default function NewsCard({ item = {} }) {
               e.stopPropagation();
               handleShare();
             }}
+            title="Share"
           >
-            <FaShareAlt />
+            <FaShareAlt className="hover:text-black" />
           </button>
         </div>
       </div>

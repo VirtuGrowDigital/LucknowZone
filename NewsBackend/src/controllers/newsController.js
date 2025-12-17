@@ -265,24 +265,40 @@ export const toggleHidden = async (req, res) => {
    📄 PAGINATION
    ========================================================= */
 export const getPaginatedNews = async (req, res) => {
-  const { page = 1, limit = 10, category } = req.query;
-  let query = { hidden: false, status: "approved" };
+  try {
+    let { page = 1, limit = 10, category } = req.query;
 
-  if (category && category !== "All") query.category = category;
+    page = Number(page);
+    limit = Number(limit);
 
-  const data = await News.find(query)
-    .sort({ createdAt: -1 })
-    .skip((page - 1) * limit)
-    .limit(Number(limit));
+    if (Number.isNaN(page) || Number.isNaN(limit)) {
+      return res.status(400).json({ error: "Invalid pagination params" });
+    }
 
-  const total = await News.countDocuments(query);
+    let query = { hidden: false, status: "approved" };
 
-  res.json({
-    success: true,
-    data,
-    total,
-    pages: Math.ceil(total / limit),
-  });
+    if (category && category !== "All") {
+      query.category = category;
+    }
+
+    const data = await News.find(query)
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    const total = await News.countDocuments(query);
+
+    res.json({
+      success: true,
+      data,
+      total,
+      pages: Math.ceil(total / limit),
+      page,
+    });
+  } catch (err) {
+    console.error("Pagination error:", err);
+    res.status(500).json({ error: "Failed to load paginated news" });
+  }
 };
 
 /* =========================================================
@@ -342,5 +358,22 @@ export const toggleBreakingNews = async (req, res) => {
   } catch (err) {
     console.error("❌ Toggle breaking news error:", err);
     res.status(500).json({ success: false });
+  }
+};
+
+export const getDontMissNews = async (req, res) => {
+  try {
+    const news = await News.find({
+      isDontMiss: true,
+      status: "approved",
+      hidden: false,
+    })
+      .sort({ createdAt: -1 })
+      .limit(5);
+
+    res.json({ success: true, data: news });
+  } catch (err) {
+    console.error("DontMiss error:", err);
+    res.status(500).json({ error: "Failed to load Dont Miss news" });
   }
 };

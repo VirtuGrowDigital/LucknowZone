@@ -8,25 +8,9 @@ export default function DontMiss() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    API.get("/news")
+    API.get("/news/dont-miss")
       .then((res) => {
-        const all = Array.isArray(res.data) ? res.data : res.data.data;
-
-        // ✅ FILTER: ONLY DONT MISS NEWS
-        const dontMiss = all
-          .filter(
-            (n) =>
-              n &&
-              n.image &&
-              n.category === "DontMiss" && // 🔥 KEY LINE
-              n.isApproved !== false // safe for admin + API
-          )
-          .sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          )
-          .slice(0, 3); // show only 3
-
-        setItems(dontMiss);
+        setItems(res.data?.data || []);
       })
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
@@ -39,14 +23,13 @@ export default function DontMiss() {
       {/* HEADER */}
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold">Don&apos;t Miss</h3>
-        <span className="text-blue-400 text-sm cursor-pointer">▶</span>
       </div>
 
       {/* NEWS ITEMS */}
       {items.map((item, index) => (
         <div
           key={item._id}
-          onClick={() => navigate(`/blog/${item.slug || item._id}`)}
+          onClick={() => navigate(`/news/${item._id}`)}
           className={`cursor-pointer ${
             index !== items.length - 1 ? "mb-4" : ""
           }`}
@@ -62,7 +45,7 @@ export default function DontMiss() {
           </p>
 
           <p className="text-xs text-gray-400 mt-1">
-            {item.source || "Admin"}
+            {item.isAPI ? "Source" : "Admin"}
           </p>
         </div>
       ))}

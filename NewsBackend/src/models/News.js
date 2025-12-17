@@ -30,6 +30,9 @@ const NewsSchema = new mongoose.Schema(
     isAPI: { type: Boolean, default: false }, // API news cannot be edited/deleted
 
     hidden: { type: Boolean, default: false }, // used for toggle hide
+    
+    isDontMiss: { type: Boolean, default: false },
+ 
 
     // 🔹 NEW: Region (for API news classification)
     region: {

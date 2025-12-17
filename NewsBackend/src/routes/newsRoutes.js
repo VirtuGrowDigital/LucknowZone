@@ -77,7 +77,7 @@ router.get("/:id", async (req, res) => {
 router.get("/", getAllNews);
 router.get("/paginated", getPaginatedNews);
 router.post("/", auth, createNews);
-
+router.get("/dont-miss", getDontMissNews);
 router.put("/:id", auth, updateNews);
 router.delete("/:id", auth, deleteNews);
 router.put("/toggle/:id", auth, toggleHidden);
