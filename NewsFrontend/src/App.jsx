@@ -11,7 +11,7 @@ import BlogPage from "./pages/BlogPage";
 import BlogDetailPage from "./pages/BlogDetailPage";
 import SavedArticles from "./pages/SavedArticles";
 import { SaveProvider } from "./context/SaveContext";
-
+import NewsDetailPage from "./pages/NewsDetailPage";
 import { WeatherProvider } from "./context/WeatherContext";
 import Footer from "./Components/Footer";
 
@@ -56,6 +56,7 @@ export default function App() {
           <Route path="/health" element={<CategoryPage />} />
           <Route path="/business" element={<CategoryPage />} />
           <Route path="/entertainment" element={<CategoryPage />} />
+          <Route path="/news/:id" element={<NewsDetailPage />} />
         </Routes>
 
         <Footer />

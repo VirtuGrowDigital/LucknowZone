@@ -177,11 +177,9 @@ export default function AddNews() {
             </label>
             <select
               name="category"
-              className="
-              w-full border p-3 rounded-xl
-              shadow-sm focus:ring-2 focus:ring-red-600
-              outline-none text-sm sm:text-base
-            "
+              className="w-full border p-3 rounded-xl
+  shadow-sm focus:ring-2 focus:ring-red-600
+  outline-none text-sm sm:text-base"
               value={form.category}
               onChange={handleChange}
               required
@@ -195,6 +193,9 @@ export default function AddNews() {
               <option value="Business">Business</option>
               <option value="Entertainment">Entertainment</option>
               <option value="Top Stories">Top Stories</option>
+
+              {/* ✅ NEW */}
+              <option value="DontMiss">Don’t Miss</option>
             </select>
           </div>
 

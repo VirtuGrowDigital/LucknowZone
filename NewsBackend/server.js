@@ -44,6 +44,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "https://lucknowzone.netlify.app",
   "https://lucknowzoneadmin.netlify.app",
+  "http://localhost:5174",
 ];
 
 app.use(

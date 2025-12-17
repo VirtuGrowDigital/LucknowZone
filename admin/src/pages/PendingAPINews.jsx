@@ -15,6 +15,7 @@ const CATEGORIES = [
   "Sports",
   "Tech",
   "TopStories",
+  "DontMiss",
 ];
 
 export default function PendingAPINews() {
