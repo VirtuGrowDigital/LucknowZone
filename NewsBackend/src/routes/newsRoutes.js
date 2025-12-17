@@ -21,6 +21,7 @@ import {
   toggleBreakingNews,
   getNewsByRegion,
   undoApproveNews,
+  getDontMissNews,
 } from "../controllers/newsController.js";
 
 const router = express.Router();
