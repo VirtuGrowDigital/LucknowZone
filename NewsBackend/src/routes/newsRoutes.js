@@ -29,32 +29,40 @@ const router = express.Router();
 /* ===========================
    📥 API NEWS
 =========================== */
-
 router.get("/import", importExternalNews);
 router.get("/by-region", getNewsByRegion);
 
 /* ===========================
    🕒 PENDING API NEWS
 =========================== */
-
 router.get("/pending", getPendingNews);
 router.patch("/:id/approve", approveNews);
 router.patch("/:id/reject", rejectNews);
 router.patch("/:id/undo", undoApproveNews);
 
 /* ===========================
-   🔥 BREAKING NEWS (MUST COME FIRST)
+   🔥 BREAKING NEWS
 =========================== */
-
 router.get("/breaking", getBreakingNews);
 router.post("/breaking", auth, addBreakingNews);
 router.delete("/breaking/:id", auth, deleteBreakingNews);
 router.patch("/breaking/:id/toggle", auth, toggleBreakingNews);
 
 /* ===========================
-   🔍 SINGLE NEWS (AMP PAGE)
+   ⭐ DONT MISS (⬅️ MOVED UP)
 =========================== */
+router.get("/dont-miss", getDontMissNews);
 
+/* ===========================
+   📰 NEWS LIST & PAGINATION
+=========================== */
+router.get("/", getAllNews);
+router.get("/paginated", getPaginatedNews);
+router.post("/", auth, createNews);
+
+/* ===========================
+   🔍 SINGLE NEWS (MUST BE LAST)
+=========================== */
 router.get("/:id", async (req, res) => {
   try {
     if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
@@ -72,13 +80,8 @@ router.get("/:id", async (req, res) => {
 });
 
 /* ===========================
-   📰 NEWS LIST & CRUD
+   ✏️ UPDATE / DELETE / TOGGLE
 =========================== */
-
-router.get("/", getAllNews);
-router.get("/paginated", getPaginatedNews);
-router.post("/", auth, createNews);
-router.get("/dont-miss", getDontMissNews);
 router.put("/:id", auth, updateNews);
 router.delete("/:id", auth, deleteNews);
 router.put("/toggle/:id", auth, toggleHidden);
