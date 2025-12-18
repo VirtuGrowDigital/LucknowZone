@@ -22,6 +22,7 @@ import {
   getNewsByRegion,
   undoApproveNews,
   getDontMissNews,
+  toggleDontMiss,
 } from "../controllers/newsController.js";
 
 const router = express.Router();
@@ -52,6 +53,7 @@ router.patch("/breaking/:id/toggle", auth, toggleBreakingNews);
    ⭐ DONT MISS (⬅️ MOVED UP)
 =========================== */
 router.get("/dont-miss", getDontMissNews);
+router.patch("/:id/dont-miss", auth, toggleDontMiss); // ✅ ADDED
 
 /* ===========================
    📰 NEWS LIST & PAGINATION

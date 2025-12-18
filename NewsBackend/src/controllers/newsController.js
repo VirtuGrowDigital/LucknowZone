@@ -377,3 +377,26 @@ export const getDontMissNews = async (req, res) => {
     res.status(500).json({ error: "Failed to load Dont Miss news" });
   }
 };
+// =========================================================
+// ⭐ TOGGLE DONT MISS (ADMIN ONLY)
+// =========================================================
+export const toggleDontMiss = async (req, res) => {
+  try {
+    const news = await News.findById(req.params.id);
+    if (!news) {
+      return res.status(404).json({ error: "News not found" });
+    }
+
+    news.isDontMiss = !news.isDontMiss;
+    await news.save();
+
+    res.json({
+      success: true,
+      isDontMiss: news.isDontMiss,
+    });
+  } catch (err) {
+    console.error("Toggle DontMiss error:", err);
+    res.status(500).json({ error: "Failed to toggle Dont Miss" });
+  }
+};
+
