@@ -387,16 +387,32 @@ export const toggleDontMiss = async (req, res) => {
       return res.status(404).json({ error: "News not found" });
     }
 
-    news.isDontMiss = !news.isDontMiss;
+    const newValue = !news.isDontMiss;
+
+    news.isDontMiss = newValue;
+
+    // 🔑 THIS WAS MISSING
+    if (newValue) {
+      news.status = "approved";
+      news.hidden = false;
+    }
+
     await news.save();
 
     res.json({
       success: true,
-      isDontMiss: news.isDontMiss,
+      message: newValue
+        ? "Approved and added to Don't Miss"
+        : "Removed from Don't Miss",
+      data: {
+        isDontMiss: news.isDontMiss,
+        status: news.status,
+      },
     });
   } catch (err) {
     console.error("Toggle DontMiss error:", err);
-    res.status(500).json({ error: "Failed to toggle Dont Miss" });
+    res.status(500).json({ error: "Failed to update Dont Miss" });
   }
 };
+
 
