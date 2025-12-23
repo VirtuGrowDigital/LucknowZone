@@ -23,6 +23,7 @@ import {
   undoApproveNews,
   getDontMissNews,
   toggleDontMiss,
+  refreshApiNews,
 } from "../controllers/newsController.js";
 
 const router = express.Router();
@@ -32,6 +33,8 @@ const router = express.Router();
 =========================== */
 router.get("/import", importExternalNews);
 router.get("/by-region", getNewsByRegion);
+router.post("/refresh-api", auth, refreshApiNews);
+
 
 /* ===========================
    🕒 PENDING API NEWS

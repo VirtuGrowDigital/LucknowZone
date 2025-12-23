@@ -8,14 +8,21 @@ import toast from "react-hot-toast";
 import { format, formatDistanceToNow } from "date-fns";
 
 const CATEGORIES = [
+  "Top Stories",
   "Business",
   "Entertainment",
   "Health",
   "Politics",
   "Sports",
   "Tech",
-  "Top Stories",
   "DontMiss",
+];
+
+const REGIONS = [
+  { label: "All", value: "all" },
+  { label: "Lucknow", value: "local" },
+  { label: "National", value: "national" },
+  { label: "International", value: "international" },
 ];
 
 export default function PendingAPINews() {
@@ -26,16 +33,21 @@ export default function PendingAPINews() {
   const [approveMenu, setApproveMenu] = useState(null);
   const [recentlyApproved, setRecentlyApproved] = useState(null);
 
-  // 🔹 SORT STATE
-  const [sortOrder, setSortOrder] = useState("latest"); // latest | oldest
+  const [sortOrder, setSortOrder] = useState("latest");
+  const [region, setRegion] = useState("all");
 
   // =============================
   // Load pending API news
   // =============================
-  const loadPending = async () => {
+  const loadPending = async (selectedRegion = region) => {
     setLoading(true);
     try {
-      const res = await API.get("/news/pending");
+      const url =
+        selectedRegion === "all"
+          ? "/news/pending"
+          : `/news/pending?region=${selectedRegion}`;
+
+      const res = await API.get(url);
       setPending(res.data.pending || []);
     } catch (err) {
       console.log("Fetch pending error:", err);
@@ -45,8 +57,26 @@ export default function PendingAPINews() {
   };
 
   useEffect(() => {
-    loadPending();
-  }, []);
+    loadPending(region);
+  }, [region]);
+
+  // =============================
+  // Refresh API News (NEW)
+  // =============================
+  const refreshApiNews = async () => {
+    try {
+      toast.loading("Refreshing API news…", { id: "refresh" });
+
+      await API.post("/news/refresh-api");
+
+      toast.success("API news refreshed", { id: "refresh" });
+
+      loadPending(region);
+    } catch (err) {
+      toast.error("Failed to refresh news", { id: "refresh" });
+      console.log(err);
+    }
+  };
 
   // =============================
   // Format time info
@@ -61,7 +91,7 @@ export default function PendingAPINews() {
   };
 
   // =============================
-  // SORTED DATA (MEMOIZED)
+  // SORTED DATA
   // =============================
   const sortedPending = useMemo(() => {
     return [...pending].sort((a, b) => {
@@ -82,7 +112,7 @@ export default function PendingAPINews() {
       setApproveMenu(null);
       setRecentlyApproved(id);
 
-      loadPending();
+      loadPending(region);
 
       setTimeout(() => setRecentlyApproved(null), 8000);
     } catch (err) {
@@ -99,7 +129,7 @@ export default function PendingAPINews() {
       await API.patch(`/news/${id}/undo`);
       toast("Approval undone", { icon: "↩️" });
       setRecentlyApproved(null);
-      loadPending();
+      loadPending(region);
     } catch {
       toast.error("Undo failed");
     }
@@ -112,7 +142,7 @@ export default function PendingAPINews() {
     try {
       await API.patch(`/news/${id}/reject`);
       toast.error("News rejected");
-      loadPending();
+      loadPending(region);
     } catch (err) {
       console.log("Reject error:", err);
     }
@@ -122,7 +152,7 @@ export default function PendingAPINews() {
     <DashboardLayout>
       <div className="p-4 md:p-6">
         {/* TOP BAR */}
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <button
             onClick={() => navigate(-1)}
             className="bg-white px-4 py-2 rounded-xl shadow border text-sm"
@@ -130,15 +160,43 @@ export default function PendingAPINews() {
             ⬅ Back
           </button>
 
-          {/* SORT BUTTON */}
-          <button
-            onClick={() =>
-              setSortOrder(sortOrder === "latest" ? "oldest" : "latest")
-            }
-            className="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm font-medium"
-          >
-            Sort: {sortOrder === "latest" ? "Latest ↓" : "Oldest ↑"}
-          </button>
+          <div className="flex gap-2 flex-wrap">
+            <button
+              onClick={() =>
+                setSortOrder(sortOrder === "latest" ? "oldest" : "latest")
+              }
+              className="bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm font-medium"
+            >
+              Sort: {sortOrder === "latest" ? "Latest ↓" : "Oldest ↑"}
+            </button>
+
+            {/* 🔄 REFRESH BUTTON */}
+            <button
+              onClick={refreshApiNews}
+              className="bg-blue-600 hover:bg-blue-700 text-white
+              px-4 py-2 rounded-lg text-sm font-medium"
+            >
+              🔄 Refresh API News
+            </button>
+          </div>
+        </div>
+
+        {/* REGION FILTER */}
+        <div className="flex gap-2 mb-6 flex-wrap">
+          {REGIONS.map((r) => (
+            <button
+              key={r.value}
+              onClick={() => setRegion(r.value)}
+              className={`px-3 py-1 rounded-lg text-xs font-medium border
+                ${
+                  region === r.value
+                    ? "bg-black text-white"
+                    : "bg-white hover:bg-gray-100"
+                }`}
+            >
+              {r.label}
+            </button>
+          ))}
         </div>
 
         {/* HEADER */}

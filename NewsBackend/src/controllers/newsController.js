@@ -187,23 +187,19 @@ export const approveNews = async (req, res) => {
   // ⭐ Handle DontMiss separately (FLAG)
   if (category === "DontMiss") {
     update.isDontMiss = true;
-  } 
+  }
   // ⭐ Normal categories (SCHEMA SAFE)
   else if (category) {
     update.category = category;
     update.isDontMiss = false;
   }
 
-  const updated = await News.findByIdAndUpdate(
-    req.params.id,
-    update,
-    { new: true }
-  );
+  const updated = await News.findByIdAndUpdate(req.params.id, update, {
+    new: true,
+  });
 
   res.json({ success: true, updated });
 };
-
-
 
 /* =========================================================
    ↩ UNDO APPROVAL
@@ -256,6 +252,26 @@ export const updateNews = async (req, res) => {
   });
 
   res.json({ success: true, updated });
+};
+
+export const refreshApiNews = async (req, res) => {
+  try {
+    // ⏱ Delete API news older than 3 days
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+
+    await News.deleteMany({
+      isAPI: true,
+      createdAt: { $lt: threeDaysAgo },
+    });
+
+    // 🔄 Re-import fresh news (reuse existing logic)
+    req.query.region = "international";
+    await importExternalNews(req, res);
+  } catch (err) {
+    console.error("Refresh API news error:", err);
+    res.status(500).json({ error: "Failed to refresh API news" });
+  }
 };
 
 export const deleteNews = async (req, res) => {
@@ -429,5 +445,3 @@ export const toggleDontMiss = async (req, res) => {
     res.status(500).json({ error: "Failed to update Dont Miss" });
   }
 };
-
-
