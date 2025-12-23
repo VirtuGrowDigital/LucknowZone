@@ -3,6 +3,7 @@ import NewsList from "./NewsList";
 import LiveAQICard from "./LiveAQICard";
 import WeatherForecastCard from "./WeatherForecastCard";
 import TrendingNews from "./TrendingNews";
+import DontMiss from "./DontMiss";
 
 export default function PageLayout({ title, news }) {
   return (
@@ -24,6 +25,7 @@ export default function PageLayout({ title, news }) {
         <LiveAQICard />
         <WeatherForecastCard />
         <TrendingNews />
+        <DontMiss />
       </div>
     </div>
   );

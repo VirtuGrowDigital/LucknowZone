@@ -7,16 +7,20 @@ export default function DontMiss() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  if (loading || !items.length) return null;
+
   useEffect(() => {
     API.get("/news/dont-miss")
       .then((res) => {
+        console.log("DONT MISS API:", res.data);
         setItems(res.data?.data || []);
       })
-      .catch(() => setItems([]))
+      .catch((err) => {
+        console.error("DontMiss error:", err);
+        setItems([]);
+      })
       .finally(() => setLoading(false));
   }, []);
-
-  if (loading || !items.length) return null;
 
   return (
     <div className="bg-[#111] rounded-xl p-3 text-white">

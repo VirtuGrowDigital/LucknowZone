@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import API from "../utils/api";
 import PageLayout from "../Components/PageLayout";
+import DontMiss from "../Components/DontMiss"
 
 export default function CategoryPage() {
   const { category } = useParams();
@@ -40,5 +41,7 @@ export default function CategoryPage() {
     <div className="max-w-7xl mx-auto px-4 pb-10">
       <PageLayout title={title} news={news} />
     </div>
+    
+    
   );
 }

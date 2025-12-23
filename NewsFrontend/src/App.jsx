@@ -14,7 +14,7 @@ import { SaveProvider } from "./context/SaveContext";
 import NewsDetailPage from "./pages/NewsDetailPage";
 import { WeatherProvider } from "./context/WeatherContext";
 import Footer from "./Components/Footer";
-
+import DontMiss from "./Components/DontMiss";
 export default function App() {
   return (
     <WeatherProvider>

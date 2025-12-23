@@ -176,19 +176,34 @@ export const getNewsByRegion = async (req, res) => {
    ✅ APPROVE (WITH REGION)
    ========================================================= */
 export const approveNews = async (req, res) => {
-  const { region } = req.body;
+  const { region, category } = req.body;
+
+  const update = {
+    status: "approved",
+    hidden: false,
+    ...(region && { region }),
+  };
+
+  // ⭐ Handle DontMiss separately (FLAG)
+  if (category === "DontMiss") {
+    update.isDontMiss = true;
+  } 
+  // ⭐ Normal categories (SCHEMA SAFE)
+  else if (category) {
+    update.category = category;
+    update.isDontMiss = false;
+  }
 
   const updated = await News.findByIdAndUpdate(
     req.params.id,
-    {
-      status: "approved",
-      ...(region && { region }),
-    },
+    update,
     { new: true }
   );
 
   res.json({ success: true, updated });
 };
+
+
 
 /* =========================================================
    ↩ UNDO APPROVAL

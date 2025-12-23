@@ -14,7 +14,7 @@ const CATEGORIES = [
   "Politics",
   "Sports",
   "Tech",
-  "TopStories",
+  "Top Stories",
   "DontMiss",
 ];
 
