@@ -6,6 +6,7 @@ const BlogSchema = new mongoose.Schema({
   content: String,
   image: String, 
   tags: String,
+  type: blog,
   createdAt: Date,
 });
 

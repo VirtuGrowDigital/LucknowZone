@@ -8,6 +8,7 @@ export const createBlog = async (req, res) => {
       content: req.body.content,
       image: req.body.image,
       tags: req.body.tags,
+      type: "blog",
       createdAt: new Date(),
     });
 
