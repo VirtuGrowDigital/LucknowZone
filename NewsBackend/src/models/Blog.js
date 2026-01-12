@@ -4,9 +4,13 @@ const BlogSchema = new mongoose.Schema({
   title: String,
   slug: String,
   content: String,
-  image: String, 
+  image: String,
   tags: String,
-  type: blog,
+  type: {
+    type: String,
+    default: "blog",
+    immutable: true,
+  },
   createdAt: Date,
 });
 
