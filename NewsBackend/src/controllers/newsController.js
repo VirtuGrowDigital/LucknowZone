@@ -309,7 +309,7 @@ export const getPaginatedNews = async (req, res) => {
     let query = { hidden: false, status: "approved" };
 
     if (category && category !== "All") {
-      query.category = category;
+      query.category = { $regex: `^${category}$`, $options: "i" };
     }
 
     const data = await News.find(query)
