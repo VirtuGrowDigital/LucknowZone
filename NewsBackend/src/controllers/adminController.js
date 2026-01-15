@@ -9,7 +9,9 @@ export const loginAdmin = async (req, res) => {
 
     console.log("📩 Admin login email:", email);
 
-    const admin = await Admin.findOne({ email });
+    const admin = await Admin.findOne({ email: email.toLowerCase() }).select(
+      "+password"
+    );
 
     if (!admin) {
       console.log("❌ Admin not found");
@@ -23,15 +25,12 @@ export const loginAdmin = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const token = jwt.sign(
-      { id: admin._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const token = jwt.sign({ id: admin._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
     console.log("✅ Admin login successful");
     res.json({ token });
-
   } catch (error) {
     console.log("🔥 Admin login error:", error.message);
     res.status(500).json({ message: error.message });
