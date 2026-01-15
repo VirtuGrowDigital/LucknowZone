@@ -37,25 +37,17 @@ export default function App() {
         <MainNav />
 
         <Routes>
-          {/* HOME */}
           <Route path="/" element={<TopStories />} />
           <Route path="/top-stories" element={<Navigate to="/" />} />
 
-          {/* BLOG */}
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:slug" element={<BlogDetailPage />} />
 
-          {/* SAVED ARTICLES (LOGIN REQUIRED) */}
           <Route path="/saved" element={<SavedArticles />} />
 
-          {/* CATEGORIES */}
-          <Route path="/local" element={<CategoryPage />} />
-          <Route path="/politics" element={<CategoryPage />} />
-          <Route path="/sports" element={<CategoryPage />} />
-          <Route path="/tech" element={<CategoryPage />} />
-          <Route path="/health" element={<CategoryPage />} />
-          <Route path="/business" element={<CategoryPage />} />
-          <Route path="/entertainment" element={<CategoryPage />} />
+          {/* ONE dynamic category route */}
+          <Route path="/:category" element={<CategoryPage />} />
+
           <Route path="/news/:id" element={<NewsDetailPage />} />
         </Routes>
 

@@ -10,13 +10,13 @@ export default function CategoryPage() {
   useEffect(() => {
     if (!category) return;
 
+    // 🌍 REGION HANDLING
     let region = null;
+    if (category === "local") region = "local";
+    else if (category === "national") region = "national";
+    else if (category === "international") region = "international";
 
-    if (category === "local-news") region = "local";
-    else if (category === "national-news") region = "national";
-    else if (category === "international-news") region = "international";
-
-    // ✅ REMOVE -news properly
+    // 🧹 CLEAN CATEGORY
     const cleanCategory = category.replace("-news", "");
 
     const formatted = cleanCategory
@@ -27,17 +27,20 @@ export default function CategoryPage() {
       ? `/news/by-region?region=${region}`
       : `/news?category=${encodeURIComponent(formatted)}`;
 
-    console.log("Fetching:", url); // 🔍 TEMP DEBUG
+    console.log("Fetching:", url);
 
     API.get(url)
       .then((res) => {
         setNews(res.data?.data || []);
       })
-      .catch((err) => console.log("Category load error:", err));
+      .catch((err) => console.error("Category load error:", err));
   }, [category]);
 
   const title = category
-    ? category.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+    ? category
+        .replace("-news", "")
+        .replace(/-/g, " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase())
     : "News";
 
   return (

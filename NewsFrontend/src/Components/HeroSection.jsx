@@ -105,13 +105,9 @@ export default function HeroSection() {
             </div>
 
             <button
-              className="
-    mt-6 px-7 py-3 
-    text-white rounded-full font-semibold shadow-lg flex items-center gap-2 mx-auto
-    transition-all duration-300
-    bg-gradient-to-r from-[#EF4444] to-[#FB923C]
-    hover:from-[#FB923C] hover:to-[#EF4444]
-  "
+              type="button"
+              onClick={() => window.location.reload()}
+              className="mt-6 px-7 py-3 text-white rounded-full font-semibold shadow-lg flex items-center gap-2 mx-auto transition-all duration-300 bg-gradient-to-r from-[#EF4444] to-[#FB923C] hover:from-[#FB923C] hover:to-[#EF4444]"
             >
               <span className="w-2 h-2 bg-white rounded-full animate-ping"></span>
               Watch Live Now
